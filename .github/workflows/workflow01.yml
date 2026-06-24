@@ -1,0 +1,62 @@
+name: Lint
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Node.js
+    runs-on: self-hosted
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["14.x"]
+
+    steps:
+      - name: Checkout https://github.com/${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run linter
+        run: npx --no-install jshint@2.12.0 .
+
+  gitleaks:
+    name: gitleaks
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  trufflehog:
+    name: trufflehog
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --only-verified
+
+  semgrep:
+    runs-on: self-hosted
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep scan
+        run: semgrep ci
+        env:
+          SEMGREP_RULES: "p/owasp-top-ten p/javascript"
