@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    name: Node.js
+    name: Lint
     runs-on: self-hosted
 
     strategy:
@@ -74,10 +74,10 @@ jobs:
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@v5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: "sqp_6e37acc42984b3d42b945c3a30600e416a66ffcf"
+          SONAR_HOST_URL: "http://localhost:9000"
       - name: Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@v1
         timeout-minutes: 5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: "sqp_6e37acc42984b3d42b945c3a30600e416a66ffcf"
