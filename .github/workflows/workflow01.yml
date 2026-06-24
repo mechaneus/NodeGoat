@@ -28,6 +28,7 @@ jobs:
   gitleaks:
     name: gitleaks
     runs-on: self-hosted
+    needs: [lint]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,6 +41,7 @@ jobs:
   trufflehog:
     name: trufflehog
     runs-on: self-hosted
+    needs: [lint]    
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,6 +54,7 @@ jobs:
 
   semgrep:
     runs-on: self-hosted
+    needs: [gitleaks,trufflehog]    
     container:
       image: semgrep/semgrep
     steps:
@@ -62,7 +65,8 @@ jobs:
           SEMGREP_RULES: "p/owasp-top-ten p/javascript"
 
   sonarqube:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    needs: [gitleaks,trufflehog]        
     steps:
       - uses: actions/checkout@v4
         with:
