@@ -1,4 +1,4 @@
-name: Lint
+name: Pipeline 01
 on: [push, pull_request]
 
 jobs:
